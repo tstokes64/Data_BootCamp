@@ -1,0 +1,92 @@
+Sub Testing2()
+
+Dim firstrow As String
+Dim I, row As Long
+Dim total, lastRowIndex As Double
+Dim End_Year, Start_Year As Double
+Dim writetorow, WS_Count, s As Integer
+WS_Count = ActiveWorkbook.Worksheets.Count
+Dim starting_ws As Worksheet
+
+Set starting_ws = ActiveSheet 'remember which worksheet is active in the beginning
+ws_num = ThisWorkbook.Worksheets.Count
+
+For s = 1 To ws_num
+    ThisWorkbook.Worksheets(s).Activate
+
+'Builds Headings for new chart
+Cells(1, 9).Value = "Ticker"
+Cells(1, 10).Value = "Yearly Change"
+Cells(1, 11).Value = "Percent Change"
+Cells(1, 12).Value = "Total Stock Value"
+Cells(1, 16).Value = "Ticker"
+Cells(1, 17).Value = "Value"
+Cells(2, 15).Value = "Greatest % Increased"
+Cells(3, 15).Value = "Greatest % Decreased"
+Cells(4, 15).Value = "Greatest Total Volume"
+
+
+'Crates section for values to be pasted.
+firstrow = Range("A2").Value
+total = Range("G2").Value
+Start_Year = Format(Range("C2").Value, "##0.00")
+writetorow = 2
+lastRowIndex = ActiveSheet.Cells(ActiveSheet.Rows.Count, "G").End(xlUp).row
+
+
+'Sumif(Range,Criteria,sumrange) Written in VBA code.
+    For row = 3 To lastRowIndex
+        If Cells(row, 1).Value = firstrow Then
+            total = total + Cells(row, 7).Value
+         
+        ElseIf Start_Year = 0 Then
+        'Stop
+            End_Year = Cells(row - 1, 6).Value
+            Cells(writetorow, 9).Value = firstrow
+            Cells(writetorow, 10).Value = End_Year - Start_Year
+            Cells(writetorow, 11).Value = "%" & End_Year / 100
+            Cells(writetorow, 12).Value = total
+            
+
+            writetorow = writetorow + 1
+
+            firstrow = Cells(row, 1).Value
+            Start_Year = Format(Range("C2").Value, "##0.00")
+        
+        Else
+        'Stop
+            End_Year = Cells(row - 1, 6).Value
+            Cells(writetorow, 9).Value = firstrow
+            Cells(writetorow, 10).Value = End_Year - Start_Year
+            'Cells(writetorow, 11).Value = (End_Year - Start_Year) / Start_Year
+            Cells(writetorow, 11).Value = "%" & Round((End_Year - Start_Year) / (Start_Year) * 100, 4)
+            Cells(writetorow, 12).Value = total
+
+            writetorow = writetorow + 1
+
+            firstrow = Cells(row, 1).Value
+            Start_Year = Format(Cells(row, 3).Value, "##0.00")
+            
+            total = Cells(row, 2).Value
+            total = 0
+        End If
+
+    Next row
+    Dim cell As Range
+        For c = 2 To lastRowIndex
+            If Cells(c, 11).Value > 0 Then
+                Cells(c, 11).Interior.color = 5287936
+            ElseIf Cells(c, 11).Value < 0 Then
+                Cells(c, 11).Interior.color = 255
+            End If
+        Next c
+
+Next s
+
+End Sub
+
+
+
+
+
+
